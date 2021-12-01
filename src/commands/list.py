@@ -1,6 +1,8 @@
+import numpy as np
 from commands.command import Command
 from datetime import datetime
 from tasks import Task
+from utils import sum_time
 
 class ListCommand(Command):
     def exec(self, tasks: Task, args) -> Task:
@@ -8,7 +10,9 @@ class ListCommand(Command):
         def row_to_dict(cols, row):
             ret = {}
             for col in cols:
-                if col == "start" or col == "end":
+                if isinstance(row[col], float) and np.isnan(row[col]):
+                    v = "-"
+                elif col == "start" or col == "end":
                     v = datetime.fromtimestamp(row[col]).strftime("%d-%m-%Y %H:%M")
                 elif col == "diff":
                     v = sum_time(row[col])
@@ -54,32 +58,6 @@ class ListCommand(Command):
                 print(row)
             # end
             print(break_line)
-
-        def sum_time(time):
-            ret = ""
-            # secs
-            #secs = time % 60
-            remainder = time // 60
-            #ret = f"{int(secs)} seconds" + ret
-            if remainder == 0:
-                return ret
-            # mins
-            mins = remainder % 60
-            remainder = remainder // 60
-            ret = f"{int(mins)} minutes" + ret
-            if remainder == 0:
-                return ret
-            # hours
-            hours = remainder % 24
-            remainder = remainder // 24
-            ret = f"{int(hours)} hours, " + ret
-            if remainder == 0:
-                return ret
-            # days
-            days = remainder
-            ret = f"{int(days)} days, " + ret
-
-            return ret
 
         task = args["task"]
         index = "i" in args
