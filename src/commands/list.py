@@ -2,7 +2,7 @@ import numpy as np
 from commands.command import Command
 from datetime import datetime
 from tasks import Task
-from utils import sum_time
+from utils import sum_time, table
 
 class ListCommand(Command):
     def exec(self, tasks: Task, args) -> Task:
@@ -27,37 +27,13 @@ class ListCommand(Command):
             tasks_to_list = tasks.tail(n)[cols]
             if index:
                 cols = cols.insert(0, "index")
-            lengths = [len(col) for col in cols]
             values = []
             for i, task_to_list in tasks_to_list.iterrows():
                 task_to_list["index"] = i
                 row = row_to_dict(cols, task_to_list)
                 values.append(row)
-                for i, col in enumerate(cols):
-                    if len(row[col]) > lengths[i]:
-                        lengths[i] = len(row[col])
 
-            # headers
-            break_line = "".join("".join(["|-" + "-" * l + "-|"]) for l in lengths)
-            print(break_line)
-            headers = ""
-            for i, col in enumerate(cols):
-                half = (lengths[i] - len(col)) // 2
-                extra = (lengths[i] - len(col)) % 2
-                headers += "| " + " " * (half + extra) + col + " " * half + " |"
-            print(headers)
-            print(break_line)
-
-            for val in values:
-                row = ""
-                for i, col in enumerate(cols):
-                    v = val[col]
-                    half = (lengths[i] - len(v)) // 2
-                    extra = (lengths[i] - len(v)) % 2
-                    row += "| " + " " * (half + extra) + v + " " * half + " |"
-                print(row)
-            # end
-            print(break_line)
+            table(cols, values)
 
         task = args["task"]
         index = "i" in args
