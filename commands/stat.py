@@ -1,4 +1,4 @@
-from commands.command import Command
+from commands import Command, CommandError
 from tasks import Task
 from time import time
 
@@ -8,8 +8,12 @@ class StatCommand(Command):
     def exec(self, tasks: Task, args) -> Task:
         [op, timeframe] = args["remainder"][0:2]
         now = time()
-        start = now - parse_timespan(timeframe)
-        print("DATE:", date_format(start))
+        try:
+            start = now - parse_timespan(timeframe)
+        except AssertionError as e:
+            raise CommandError(f"{e.args[0]} Timespan given: {timeframe}") from e
+        except KeyError as e:
+            raise CommandError("Unavailable unit selected. " + e.args[0]) from e
         df = tasks.from_date(start, ongoing=False)
         df["diff"] = df["end"] - df["start"]
 

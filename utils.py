@@ -59,6 +59,8 @@ def table(headers, values):
 
 def parse_timespan(span: str) -> int:
     times = re.findall("[0-9]+[a-zA-Z]", span)
+    if len(times) <= 0:
+        raise AssertionError("Incorrect formatting. Use <number><unit>, e.g. to say two days and five hours use 2d5h.")
     time_span = 0
     unit_conversion = {
         "s": 1,
@@ -75,8 +77,7 @@ def parse_timespan(span: str) -> int:
         try:
             time_span += value * unit_conversion[unit]
         except KeyError as e:
-            print(f"Used time unit {unit}.Available time units are s, m, h, d.")
-            raise e
+            raise KeyError(f"Used time unit {unit}. Available time units are {list(unit_conversion.keys())}.") from e
 
     return time_span
 

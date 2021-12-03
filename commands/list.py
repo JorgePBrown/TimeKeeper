@@ -1,6 +1,6 @@
-from commands.command import Command
+from commands import Command
 from tasks import Task
-from utils import sum_time, table, row_to_dict
+from utils import table, row_to_dict
 
 class ListCommand(Command):
     def exec(self, tasks: Task, args) -> Task:
@@ -22,12 +22,14 @@ class ListCommand(Command):
         index = "i" in args
         n = args["n"] if "n" in args else 10
 
-        df = tasks.df.copy()
-        df["diff"] = df["end"] - df["start"]
         if task is None:
+            df = tasks.df.copy()
+            df["diff"] = df["end"] - df["start"]
             list_general(df, df.columns, df.shape[0] if n == "all" else n, index=index)
         else:
             df = tasks.with_name(task)
-            list_general(df, ["start", "end", "diff"], df.shape[0] if n == "all" else n, index=index)
+            df = df.drop(columns="name")
+            df["diff"] = df["end"] - df["start"]
+            list_general(df, df.columns, df.shape[0] if n == "all" else n, index=index)
 
         return tasks

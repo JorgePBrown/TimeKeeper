@@ -1,4 +1,5 @@
 # import command
+from .command import Command, CommandError
 from .command import HelpCommand
 from .end import EndCommand
 from .tick import TickCommand

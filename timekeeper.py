@@ -1,6 +1,6 @@
 # %%
 import getpass
-from commands import HelpCommand, ListCommand, NowCommand, StartCommand, TickCommand, EndCommand, RemoveCommand, StatCommand
+from commands import CommandError, HelpCommand, ListCommand, NowCommand, StartCommand, TickCommand, EndCommand, RemoveCommand, StatCommand
 from commands.debug import DebugCommand
 
 fname = f"/home/{getpass.getuser()}/.timekeeper.txt"
@@ -28,11 +28,15 @@ def execute(command, tasks, **args):
         "stat": StatCommand(),
         "debug": DebugCommand()
     }
+    
     try:
-        commands[command].exec(tasks, args)
+        command = commands[command]
     except KeyError:
         print("Unknown command.")
-        execute("help")
+        execute("help", tasks)
+        return
+
+    command.exec(tasks, args)
 
 # %%
 if __name__ == '__main__':
@@ -58,7 +62,10 @@ if __name__ == '__main__':
             tasks = Task()
             tasks.to_file(f)
 
-    execute(command, tasks, **args)
-
-    with open(fname, "w") as f:    
-        tasks.to_file(f)
+    try:
+        execute(command, tasks, **args)
+        with open(fname, "w") as f:    
+            tasks.to_file(f)
+    except CommandError as e:
+        print(e.message)
+    

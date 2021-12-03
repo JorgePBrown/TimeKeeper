@@ -4,8 +4,8 @@ class Command:
     def __init__(self, help=None) -> None:
         self.help = help
 
-    def exec(self, tasks: Task, args) -> Task:
-        return tasks
+    def exec(self, tasks: Task, args):
+        pass
 
 class HelpCommand(Command):
     def exec(self, tasks, args):
@@ -15,4 +15,8 @@ class HelpCommand(Command):
         print()
         return tasks
 
+class CommandError(Exception):
+    @property
+    def message(self) -> str:
+        return self.args[0]
        

@@ -1,4 +1,4 @@
-from commands.command import Command
+from commands import Command
 from tasks import Task
 from utils import sum_time
 from time import time as now
