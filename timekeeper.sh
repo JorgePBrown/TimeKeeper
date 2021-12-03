@@ -1,3 +1,3 @@
 #! /bin/bash
 
-python /home/jorge/projects/timekeeper/src/timekeeper.py $@
+python /home/jorge/projects/timekeeper/timekeeper.py $@
