@@ -6,3 +6,4 @@ from .start import StartCommand
 from .list import ListCommand
 from .now import NowCommand
 from .rm import RemoveCommand
+from .stat import StatCommand

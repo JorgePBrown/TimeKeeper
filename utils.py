@@ -1,3 +1,7 @@
+import re
+from datetime import datetime
+import numpy as np
+
 def sum_time(time):
     ret = ""
     # secs
@@ -52,3 +56,44 @@ def table(headers, values):
         print(row)
     # end
     print(break_line)
+
+def parse_timespan(span: str) -> int:
+    times = re.findall("[0-9]+[a-zA-Z]", span)
+    time_span = 0
+    unit_conversion = {
+        "s": 1,
+        "m": 60,
+        "h": 60 * 60,
+        "d": 60 * 60 * 24,
+        "M": 60 * 60 * 24 * 30,
+        "y": 60 * 60 * 24 * 365
+    }
+    for time in times:
+        value = int(time[0:-1])
+        unit = time[-1]
+        try:
+            time_span += value * unit_conversion[unit]
+        except KeyError as e:
+            print(f"Used time unit {unit}.Available time units are s, m, h, d.")
+            raise e
+
+    return time_span
+
+def row_to_dict(cols, row):
+    ret = {}
+    for col in cols:
+        if isinstance(row[col], float) and np.isnan(row[col]):
+            v = "-"
+        elif col == "start" or col == "end":
+            v = date_format(row[col])
+        elif col == "diff" or col == "total_time":
+            v = sum_time(row[col])
+        else:
+            v = str(row[col])
+        
+        ret[col] = v
+
+    return ret
+
+def date_format(time: float) -> str:
+    return datetime.fromtimestamp(time).strftime("%d-%m-%Y %H:%M")

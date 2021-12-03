@@ -107,3 +107,13 @@ class Task:
     def remove(self, index):
         self.df.drop(index=index, inplace=True)
         return self
+
+    def from_date(self, start, ongoing=True):
+        df = self.df.loc[self.df["start"] > start, :]
+        if not ongoing:
+            if np.isnan(df.loc[df.index[-1], "end"]):
+                df = df.iloc[0:-1, :]
+        return df
+
+    def with_name(self, task):
+        return self.df.loc[self.df["name"] == task, :]
