@@ -7,3 +7,4 @@ from .list import ListCommand
 from .now import NowCommand
 from .rm import RemoveCommand
 from .stat import StatCommand
+from .debug import DebugCommand

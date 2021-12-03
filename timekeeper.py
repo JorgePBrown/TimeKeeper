@@ -1,6 +1,7 @@
 # %%
 import getpass
 from commands import HelpCommand, ListCommand, NowCommand, StartCommand, TickCommand, EndCommand, RemoveCommand, StatCommand
+from commands.debug import DebugCommand
 
 fname = f"/home/{getpass.getuser()}/.timekeeper.txt"
 # %%
@@ -24,7 +25,8 @@ def execute(command, tasks, **args):
         "end": EndCommand(),
         "now": NowCommand(),
         "rm": RemoveCommand(),
-        "stat": StatCommand()
+        "stat": StatCommand(),
+        "debug": DebugCommand()
     }
     try:
         commands[command].exec(tasks, args)
