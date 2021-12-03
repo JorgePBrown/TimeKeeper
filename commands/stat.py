@@ -15,7 +15,7 @@ class StatCommand(Command):
         except KeyError as e:
             raise CommandError("Unavailable unit selected. " + e.args[0]) from e
         df = tasks.from_date(start, ongoing=False)
-        df["diff"] = df["end"] - df["start"]
+        df.loc[:, "diff"] = df.loc[:, "end"] - df.loc[:, "start"]
 
         if op == "avg":
             df.groupby("name").mean()
