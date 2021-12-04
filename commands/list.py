@@ -20,7 +20,7 @@ class ListCommand(Command):
         # args
         task = args["task"]
         index = "i" in args
-        n = args["n"] if "n" in args else 10
+        n = int(args["n"]) if "n" in args else 10
 
         if task is None:
             df = tasks.df.copy()
