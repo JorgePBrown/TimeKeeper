@@ -9,8 +9,9 @@ class EndCommand(Command):
     def exec(self, tasks: Task, args):
         try:
             amend = True if "amend" in args else False
-            name = tasks.last_task["name"]
-            start_time = tasks.last_task["start"]
+            index = args.get("index", None)
+            if isinstance(index, str):
+                index = int(index)
 
             if amend:
                 if "duration" in args:
@@ -18,17 +19,17 @@ class EndCommand(Command):
                         duration = parse_timespan(args["duration"])
                     except KeyError as e:
                         raise CommandError(e.message)
-                        
-                    tasks.end(t=start_time + duration, amend=amend)
-                    print(f"Corrected {name}. Time ellapsed: {sum_time(duration)}")
+                    task = tasks.df.loc[index, :]
+                    task = tasks.end(t=task['start'] + duration, amend=amend, index=index)
+                    print(f"Corrected {task['name']}. Time ellapsed: {sum_time(duration)}")
                 elif "t" in args:
                     t = parse_date(args["t"])
-                    tasks.end(t=t, amend=amend)
-                    print(f"Corrected {name}. Ended at: {date_format(t)}")
+                    task = tasks.end(t=t, amend=amend, index=index)
+                    print(f"Corrected {task['name']}. Ended at: {date_format(t)}")
             else:
                 t = now()
-                tasks.end(t=t, amend=amend)
-                print(f"Ended {name}. Time ellapsed: {sum_time(t - start_time)}")
+                task = tasks.end(t=t, amend=amend)
+                print(f"Ended {task['name']}. Time ellapsed: {sum_time(t - task['start'])}")
         except TaskError as e:
             raise CommandError(e.message)
         

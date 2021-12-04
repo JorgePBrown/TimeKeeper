@@ -61,9 +61,6 @@ class Task:
         return self
 
     def start(self, task, t=time.time(), amend=False, index=None):
-        if task is None:
-            raise TaskError("Cannot start a task with no name.")
-
         last_task = self.last_task
 
         if amend:
@@ -76,40 +73,46 @@ class Task:
                     self.df.at[index, "start"] = t
                 self.df.sort_values("start", ascending=True, inplace=True)
         else:
+            if task is None:
+                raise TaskError("Cannot start a task with no name.")
+
             if last_task is not None and np.isnan(last_task["end"]):
                 if last_task["name"] == task:
                     return self
                 else:
                     self.df.at[self.df.shape[0] - 1, "end"] = t
-        
-        self.df = self.df.append({"name": task, "start": t}, ignore_index=True)
+
+            self.df = self.df.append({"name": task, "start": t}, ignore_index=True)
 
         return self
 
-    def end(self, t=time.time(), amend=False):
+    def end(self, t=time.time(), amend=False, index=None):
         if self.df.shape[0] > 0:
-            last_task = self.df.iloc[-1, :]
+            if index is None:
+                index = self.df.index[self.df.shape[0] - 1]
+            
+            task = self.df.loc[index, :]
 
             if amend:
-                if np.isnan(last_task["end"]):
+                if np.isnan(task["end"]):
                     raise TaskError("Can't amend unfinished task.")
                 else:
-                    if t - last_task["start"] < 60:
-                        self.df.drop(self.df.index[self.df.shape[0] - 1], inplace=True)
+                    if t - task["start"] < 60:
+                        self.df.drop(index, inplace=True)
                         raise TaskError("Task with less than one minute not allowed.")
                     else:
-                        self.df.at[self.df.shape[0] - 1, "end"] = t
+                        self.df.at[index, "end"] = t
             else:
-                if np.isnan(last_task["end"]):
-                    if t - last_task["start"] < 60:
-                        self.df.drop(self.df.index[self.df.shape[0] - 1], inplace=True)
+                if np.isnan(task["end"]):
+                    if t - task["start"] < 60:
+                        self.df.drop(index, inplace=True)
                         raise TaskError("Task with less than one minute not allowed.")
                     else:
-                        self.df.at[self.df.shape[0] - 1, "end"] = t
+                        self.df.at[index, "end"] = t
                 else:
                     raise TaskError("No ongoing task.")
             
-            return self
+            return task
         else:
             raise TaskError("No ongoing task.")
     

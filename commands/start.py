@@ -1,4 +1,4 @@
-from utils import parse_date
+from utils import date_format, parse_date
 from commands import Command
 from tasks import Task
 import time
@@ -7,10 +7,18 @@ class StartCommand(Command):
     def exec(self, tasks: Task, args: dict) -> Task:
         task = args["task"]
         amend = "amend" in args
-        index = args.get("i", None)
+        index = args.get("index", None)
+        if index is not None:
+            index = int(index)
         t = args.get("t", time.time())
         if isinstance(t, str):
             t = parse_date(t)
-        print(f"\nStarting {task}...\n")
+        
+        tasks.start(task, t=t, amend=amend, index=index)
 
-        return tasks.start(task, t=t, amend=amend, index=index)
+        if amend:
+            print(f"Task {index}'s start changed to {date_format(t)}.")
+        else:
+            print(f"\nStarting {task}...\n")
+
+        return tasks
