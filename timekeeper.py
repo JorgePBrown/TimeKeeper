@@ -8,7 +8,7 @@ fname = f"/home/{getpass.getuser()}/.timekeeper.txt"
 def get_args(argv):
     ret = {}
     try:
-        args, remainder =  getopt.getopt(argv, "hiln:", ["help", "amend", "duration="])
+        args, remainder =  getopt.getopt(argv, "hiln:t:", ["help", "amend", "duration="])
         ret = {k.replace("-", ""): v for k, v in args}
         ret["remainder"] = remainder
         ret["task"] = None if len(remainder) == 0 else remainder[0]

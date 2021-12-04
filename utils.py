@@ -81,6 +81,25 @@ def parse_timespan(span: str) -> int:
 
     return time_span
 
+def parse_date(date: str) -> float:
+    hours = int(re.findall("([0-9]{2}):", date)[0])
+    minutes = int(re.findall(":([0-9]{2})", date)[0])
+
+    date = re.findall("(\d+)(?:[\s-])", date)
+
+    now = datetime.now()
+
+    year = int(date[2]) if len(date) > 2 else now.year
+    month = int(date[1]) if len(date) > 1 else now.month
+    day = int(date[0]) if len(date) > 0 else now.day
+
+    if year < 100:
+        year += 2000
+
+    date = datetime(year, month, day, hours, minutes)
+    
+    return datetime.timestamp(date)
+
 def row_to_dict(cols, row):
     ret = {}
     for col in cols:

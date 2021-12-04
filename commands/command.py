@@ -4,7 +4,7 @@ class Command:
     def __init__(self, help=None) -> None:
         self.help = help
 
-    def exec(self, tasks: Task, args):
+    def exec(self, tasks: Task, args: dict):
         pass
 
 class HelpCommand(Command):

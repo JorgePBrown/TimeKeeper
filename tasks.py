@@ -60,14 +60,23 @@ class Task:
 
         return self
 
-    def start(self, task, t=time.time()):
+    def start(self, task, t=time.time(), amend=False, index=None):
         if task is None:
             raise TaskError("Cannot start a task with no name.")
 
-        if self.df.shape[0] > 0:
-            last_task = self.df.iloc[-1, :]
-            
-            if np.isnan(last_task["end"]):
+        last_task = self.last_task
+
+        if amend:
+            if last_task is None:
+                raise TaskError("No task to amend.")
+            else:
+                if index is None:
+                    self.df.at[self.df.shape[0] - 1, "start"] = t
+                else:
+                    self.df.at[index, "start"] = t
+                self.df.sort_values("start", ascending=True, inplace=True)
+        else:
+            if last_task is not None and np.isnan(last_task["end"]):
                 if last_task["name"] == task:
                     return self
                 else:
