@@ -93,28 +93,18 @@ class Task:
             
             task = self.df.loc[index, :]
 
-            if amend:
-                if np.isnan(task["end"]):
-                    raise TaskError("Can't amend unfinished task.")
+            if amend or np.isnan(task["end"]):
+                if t - task["start"] < 60:
+                    self.df.drop(index, inplace=True)
+                    raise TaskError("Task with less than one minute not allowed.")
                 else:
-                    if t - task["start"] < 60:
-                        self.df.drop(index, inplace=True)
-                        raise TaskError("Task with less than one minute not allowed.")
-                    else:
-                        self.df.at[index, "end"] = t
+                    self.df.at[index, "end"] = t
             else:
-                if np.isnan(task["end"]):
-                    if t - task["start"] < 60:
-                        self.df.drop(index, inplace=True)
-                        raise TaskError("Task with less than one minute not allowed.")
-                    else:
-                        self.df.at[index, "end"] = t
-                else:
-                    raise TaskError("No ongoing task.")
+                raise TaskError("No ongoing task.")
             
             return task
         else:
-            raise TaskError("No ongoing task.")
+            raise TaskError("No tasks started.")
     
     def remove(self, index):
         self.df.drop(index=index, inplace=True)
