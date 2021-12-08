@@ -61,30 +61,33 @@ class Task:
         return self
 
     def start(self, task, t=time.time(), amend=False, index=None):
-        last_task = self.last_task
+        if not amend and task is None:
+            raise TaskError("Cannot start a task with no name.")
 
-        if amend:
-            if last_task is None:
+        if self.df.shape[0] > 0:
+            if amend:
+                if index is None:
+                    index = self.df.index[self.df.shape[0] - 1]
+                self.df.at[index, "start"] = t
+
+                self.df.sort_values("start", ascending=True, inplace=True)
+                return self.df.loc[index, :]
+            else:
+                index = self.df.index[self.df.shape[0] - 1]
+                last_task = self.df.loc[index, :]
+                if np.isnan(last_task["end"]):
+                    if last_task["name"] == task:
+                        return last_task
+                    else:
+                        self.df.at[index, "end"] = t
+        else:
+            if amend:
                 raise TaskError("No task to amend.")
             else:
-                if index is None:
-                    self.df.at[self.df.shape[0] - 1, "start"] = t
-                else:
-                    self.df.at[index, "start"] = t
-                self.df.sort_values("start", ascending=True, inplace=True)
-        else:
-            if task is None:
-                raise TaskError("Cannot start a task with no name.")
-
-            if last_task is not None and np.isnan(last_task["end"]):
-                if last_task["name"] == task:
-                    return self
-                else:
-                    self.df.at[self.df.shape[0] - 1, "end"] = t
-
-            self.df = self.df.append({"name": task, "start": t}, ignore_index=True)
-
-        return self
+                pass
+        
+        self.df = self.df.append({"name": task, "start": t}, ignore_index=True)
+        return self.last_task
 
     def end(self, t=time.time(), amend=False, index=None):
         if self.df.shape[0] > 0:

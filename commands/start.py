@@ -14,11 +14,11 @@ class StartCommand(Command):
         if isinstance(t, str):
             t = parse_date(t)
         
-        tasks.start(task, t=t, amend=amend, index=index)
+        task = tasks.start(task, t=t, amend=amend, index=index)
 
         if amend:
-            print(f"Task {index}'s start changed to {date_format(t)}.")
+            print(f"Task {task['name']}'s start changed to {date_format(t)}.")
         else:
-            print(f"\nStarting {task}...\n")
+            print(f"Starting {task['name']}...")
 
         return tasks

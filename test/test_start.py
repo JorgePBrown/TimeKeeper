@@ -2,9 +2,7 @@ import time
 import unittest
 import numpy as np
 import pandas as pd
-
-from .context import src
-from src import tasks
+import tasks
 
 class StartTests(unittest.TestCase):
 
